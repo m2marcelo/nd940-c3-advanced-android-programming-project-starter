@@ -17,4 +17,5 @@
     <string name="load_app_option">LoadApp: The current starter repo for this project</string>
     <string name="glide_option">Glide: Media management and image loading framework</string>
     <string name="download">Download</string>
+    <string name="downloading">Downloading</string>
 </resources>

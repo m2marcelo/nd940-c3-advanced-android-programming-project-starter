@@ -8,47 +8,43 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.LinearInterpolator
+import androidx.annotation.StringRes
+import com.udacity.helpers.*
 import java.util.*
 import kotlin.properties.Delegates
 
-class LoadingButton @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr) {
+class LoadingButton @JvmOverloads constructor( context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : View(context, attrs, defStyleAttr) {
 
-    private var widthSize = 0
-    private var heightSize = 0
+    private val loadingRect = Rect()
+    private lateinit var valueAnimator: ValueAnimator
     private var progress = 0
     private var loadingState = 0
-    private lateinit var valueAnimator: ValueAnimator
 
-    private val cornerPath = Path()
     private val circleRect = RectF()
-    private val textRect = Rect()
-    private val loadingRect = Rect()
-    private var textToDraw = context.getString(R.string.download)
-
+    private val cornerPath = Path()
+    private val cornerRadius = 4.dpToPixels().toFloat()
 
     private var textColor = Color.WHITE
     private var primaryBackgroundColor = context.getColor(R.color.colorPrimary)
     private var secondaryBackgroundColor = context.getColor(R.color.colorPrimaryDark)
     private var circularProgressColor = context.getColor(R.color.colorAccent)
 
-    private val paint = Paint().apply {
-        isAntiAlias = true
-        textAlignment = TEXT_ALIGNMENT_CENTER
-        typeface = Typeface.DEFAULT_BOLD
+
+    enum class State(@StringRes private val textId: Int) {
+        LOADING(R.string.downloading),
+        NORMAL(R.string.download);
+
+        fun getTextId(): Int {
+            return textId
+        }
     }
 
-    private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { p, old, new ->
-        textToDraw = context.getString(R.string.download)
+    private var buttonState: State by Delegates.observable(State.NORMAL) { _, old, new ->
+        textToDraw = context.getString(new.getTextId()).toUpperCase(Locale.ENGLISH)
 
-        when(buttonState) {
-            ButtonState.Completed -> {
-                valueAnimator.cancel()
-            }
-
-            ButtonState.Loading -> {
-                if (old != ButtonState.Loading) {
+        when (buttonState) {
+            State.LOADING -> {
+                if (old != State.LOADING) {
                     valueAnimator = ValueAnimator.ofInt(0, 360).setDuration(1000).apply {
                         addUpdateListener {
                             progress = it.animatedValue as Int
@@ -57,7 +53,7 @@ class LoadingButton @JvmOverloads constructor(
                         addListener(object : AnimatorListenerAdapter() {
                             override fun onAnimationEnd(animation: Animator?) {
                                 super.onAnimationEnd(animation)
-                                this@LoadingButton.buttonState = ButtonState.Completed
+                                this@LoadingButton.buttonState = State.NORMAL
                             }
 
                             override fun onAnimationCancel(animation: Animator?) {
@@ -78,28 +74,50 @@ class LoadingButton @JvmOverloads constructor(
                     }
                 }
             }
+            State.NORMAL -> {
+                valueAnimator.cancel()
+            }
         }
+
         requestLayout()
         invalidate()
     }
 
 
     init {
+        setPadding(16.dpToPixels(), 16.dpToPixels(), 16.dpToPixels(), 16.dpToPixels())
 
-        val typedArray = context.theme.obtainStyledAttributes( attrs, R.styleable.LoadingButton,
-            defStyleAttr, 0)
+        val typedArray = context.theme.obtainStyledAttributes(
+            attrs,
+            R.styleable.LoadingButton,
+            defStyleAttr,
+            0
+        )
 
         with(typedArray) {
-            textColor = getColor( R.styleable.LoadingButton_textColor, Color.WHITE)
-
-            primaryBackgroundColor = getColor(R.styleable.LoadingButton_primaryBackgroundColor, context.getColor(R.color.colorPrimary))
-            secondaryBackgroundColor = getColor(R.styleable.LoadingButton_secondaryBackgroundColor, secondaryBackgroundColor)
-            circularProgressColor = getColor( R.styleable.LoadingButton_circularProgressColor, circularProgressColor )
+            textColor = getColor(
+                R.styleable.LoadingButton_textColor,
+                textColor
+            )
+            primaryBackgroundColor = getColor(
+                R.styleable.LoadingButton_primaryBackgroundColor,
+                primaryBackgroundColor
+            )
+            secondaryBackgroundColor = getColor(
+                R.styleable.LoadingButton_secondaryBackgroundColor,
+                secondaryBackgroundColor
+            )
+            circularProgressColor = getColor(
+                R.styleable.LoadingButton_circularProgressColor,
+                circularProgressColor
+            )
         }
 
         typedArray.recycle()
     }
 
+    private val textRect = Rect()
+    private var textToDraw = context.getString(buttonState.getTextId()).toUpperCase(Locale.ENGLISH)
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         canvas?.let {
@@ -118,7 +136,7 @@ class LoadingButton @JvmOverloads constructor(
             val textY = height / 2f + textRect.height() / 2f - textRect.bottom
 
             var textOffset = 0
-            if (buttonState == ButtonState.Loading) {
+            if (buttonState == State.LOADING) {
                 // Draw button loading background color
                 paint.color = secondaryBackgroundColor
                 if (loadingState == 0) {
@@ -159,16 +177,38 @@ class LoadingButton @JvmOverloads constructor(
         }
     }
 
+    private val paint = Paint().apply {
+        isAntiAlias = true
+        textAlignment = TEXT_ALIGNMENT_CENTER
+        textSize = 16.spToPixels().toFloat()
+        typeface = Typeface.DEFAULT_BOLD
+    }
+
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val minw: Int = paddingLeft + paddingRight + suggestedMinimumWidth
-        val w: Int = resolveSizeAndState(minw, widthMeasureSpec, 1)
-        val h: Int = resolveSizeAndState(
-            MeasureSpec.getSize(w),
-            heightMeasureSpec,
-            0
-        )
-        widthSize = w
-        heightSize = h
+        val minW = paddingLeft + paddingRight + suggestedMinimumWidth
+        val minH = paddingTop + paddingBottom + suggestedMinimumHeight
+        val w = resolveSizeAndState(minW, widthMeasureSpec, 1)
+        val h = resolveSizeAndState(minH, heightMeasureSpec, 1)
         setMeasuredDimension(w, h)
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        cornerPath.reset()
+        cornerPath.addRoundRect(
+            0f,
+            0f,
+            w.toFloat(),
+            h.toFloat(),
+            cornerRadius,
+            cornerRadius,
+            Path.Direction.CW
+        )
+        cornerPath.close()
+    }
+
+    fun setState(buttonState: State) {
+        this.buttonState = buttonState
     }
 }
