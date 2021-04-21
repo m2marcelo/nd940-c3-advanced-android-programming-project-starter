@@ -12,4 +12,21 @@ class DetailActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
     }
 
+    companion object {
+        private const val EXTRA_DOWNLOAD_ID = "download_id"
+        private const val EXTRA_DOWNLOAD_STATUS = "download_status"
+        private const val EXTRA_FILE_NAME = "file_name"
+
+        fun withExtras(
+            downloadId: Int,
+            downloadStatus: MainActivity.DownloadStatus,
+            fileName: String
+        ): Bundle {
+            return Bundle().apply {
+                putInt(EXTRA_DOWNLOAD_ID, downloadId)
+                putInt(EXTRA_DOWNLOAD_STATUS, downloadStatus.ordinal)
+                putString(EXTRA_FILE_NAME, fileName)
+            }
+        }
+    }
 }
