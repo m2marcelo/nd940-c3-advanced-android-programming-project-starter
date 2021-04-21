@@ -2,7 +2,6 @@ package com.udacity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.udacity.MainActivity
 import com.udacity.utils.DownloadNotification
 import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.content_detail.*
@@ -18,9 +17,21 @@ class DetailActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         loadExtras()
-        clearNotification()
-        initViews()
-        initListeners()
+
+        DownloadNotification.clearNotification(this, downloadId)
+
+        tv_file_name.text = fileName
+
+        tv_download_status.text = if (downloadStatus == MainActivity.DownloadStatus.SUCCESS) {
+            getString(R.string.download_success)
+        } else {
+            getString(R.string.download_fail)
+        }
+        layout_details.transitionToEnd()
+
+        btn_back.setOnClickListener {
+            finish()
+        }
     }
 
     private fun loadExtras() {
@@ -29,28 +40,6 @@ class DetailActivity : AppCompatActivity() {
             downloadId = it.getInt(EXTRA_DOWNLOAD_ID)
             downloadStatus = MainActivity.DownloadStatus.values()[it.getInt(EXTRA_DOWNLOAD_STATUS)]
             fileName = it.getString(EXTRA_FILE_NAME)!!
-        }
-    }
-
-    private fun clearNotification() {
-        DownloadNotification.clearNotification(this, downloadId)
-    }
-
-    private fun initViews() {
-        tv_file_name.text = fileName
-
-        tv_download_status.text = if (downloadStatus == MainActivity.DownloadStatus.SUCCESS) {
-            getString(R.string.download_success)
-        } else {
-            getString(R.string.download_fail)
-        }
-
-        layout_details.transitionToEnd()
-    }
-
-    private fun initListeners() {
-        btn_back.setOnClickListener {
-            finish()
         }
     }
 
