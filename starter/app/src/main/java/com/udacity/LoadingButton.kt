@@ -32,14 +32,14 @@ class LoadingButton @JvmOverloads constructor( context: Context, attrs: Attribut
 
     enum class State(@StringRes private val textId: Int) {
         LOADING(R.string.downloading),
-        NORMAL(R.string.download);
+        COMPLETED(R.string.download);
 
         fun getTextId(): Int {
             return textId
         }
     }
 
-    private var buttonState: State by Delegates.observable(State.NORMAL) { _, old, new ->
+    private var buttonState: State by Delegates.observable(State.COMPLETED) { _, old, new ->
         textToDraw = context.getString(new.getTextId()).toUpperCase(Locale.ENGLISH)
 
         when (buttonState) {
@@ -53,7 +53,7 @@ class LoadingButton @JvmOverloads constructor( context: Context, attrs: Attribut
                         addListener(object : AnimatorListenerAdapter() {
                             override fun onAnimationEnd(animation: Animator?) {
                                 super.onAnimationEnd(animation)
-                                this@LoadingButton.buttonState = State.NORMAL
+                                this@LoadingButton.buttonState = State.COMPLETED
                             }
 
                             override fun onAnimationCancel(animation: Animator?) {
@@ -74,7 +74,7 @@ class LoadingButton @JvmOverloads constructor( context: Context, attrs: Attribut
                     }
                 }
             }
-            State.NORMAL -> {
+            State.COMPLETED -> {
                 valueAnimator.cancel()
             }
         }
