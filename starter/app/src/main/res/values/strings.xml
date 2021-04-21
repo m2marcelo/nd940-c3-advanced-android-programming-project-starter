@@ -20,7 +20,7 @@
     <string name="downloading">Downloading</string>
 
     <string name="downloading_files">Downloading files</string>
-    <string name="download_success">The file was downloaded with success</string>
+    <string name="download_success">Downloaded successfully</string>
     <string name="download_fail">The download has failed</string>
     <string name="download_details">View details</string>
     <string name="file">File: </string>

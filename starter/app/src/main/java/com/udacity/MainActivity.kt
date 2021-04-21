@@ -17,19 +17,65 @@ import com.udacity.utils.DownloadNotification
 
 class MainActivity : AppCompatActivity() {
 
+
     private lateinit var downloadManager: DownloadManager
     private var filesIdList = mutableSetOf<Long>()
-    private var filesDownloading = 0
+    private var currentDownloads = 0
 
     enum class DownloadStatus {
         SUCCESS, FAIL
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        setSupportActionBar(toolbar)
+
+        registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            DownloadNotification.createNotificationChannel(
+                this,
+                DownloadNotification.getDownloadsChannel(this)
+            )
+        }
+
+        buttonListeners()
+    }
+
+
+    private fun buttonListeners() {
+        custom_button.setOnClickListener {
+            when (rg_options.checkedRadioButtonId) {
+                R.id.load_app_option -> {
+                    download(URL)
+                    custom_button.setState(LoadingButton.State.LOADING)
+                }
+                R.id.glide_option -> {
+                    download(URL_GLIDE)
+                    custom_button.setState(LoadingButton.State.LOADING)
+                }
+                R.id.option_retrofit -> {
+                    download(URL_RETROFIT)
+                    custom_button.setState(LoadingButton.State.LOADING)
+                }
+                else -> {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.choose),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+
+
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val downloadId = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
             if (filesIdList.remove(downloadId)) {
-                if (--filesDownloading == 0) {
+                if (--currentDownloads == 0) {
                     custom_button.setState(LoadingButton.State.COMPLETED)
                 }
 
@@ -68,78 +114,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
-
-        initSetup()
-        initButtonListeners()
-    }
-
-   private fun initSetup() {
-        registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            DownloadNotification.createNotificationChannel(
-                this,
-                DownloadNotification.getDownloadsChannel(this)
-            )
-        }
-    }
-
-    private fun initButtonListeners() {
-        custom_button.setOnClickListener {
-            when (rg_options.checkedRadioButtonId) {
-                R.id.load_app_option -> {
-                    download(URL)
-                    custom_button.setState(LoadingButton.State.LOADING)
-                }
-                R.id.glide_option -> {
-                    download(URL_GLIDE)
-                    custom_button.setState(LoadingButton.State.LOADING)
-                }
-                R.id.option_retrofit -> {
-                    download(URL_RETROFIT)
-                    custom_button.setState(LoadingButton.State.LOADING)
-                }
-                else -> {
-                    Toast.makeText(
-                        this,
-                        getString(R.string.choose),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        }
-    }
-
-    private fun selectDownloadSource() {
-        custom_button.setOnClickListener {
-            when (rg_options.checkedRadioButtonId) {
-                R.id.load_app_option -> {
-                    download(URL)
-                    custom_button.setState(LoadingButton.State.LOADING)
-                }
-                R.id.glide_option -> {
-                    download(URL_GLIDE)
-                    custom_button.setState(LoadingButton.State.LOADING)
-                }
-                R.id.option_retrofit -> {
-                    download(URL_RETROFIT)
-                    custom_button.setState(LoadingButton.State.LOADING)
-                }
-                else -> {
-                    Toast.makeText(
-                        this,
-                        getString(R.string.choose),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(receiver)
@@ -153,9 +127,9 @@ class MainActivity : AppCompatActivity() {
                 .setAllowedOverMetered(true)
                 .setAllowedOverRoaming(true)
 
-        val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+        downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
         filesIdList.add(downloadManager.enqueue(request))
-        filesDownloading++
+        currentDownloads++
     }
 
     companion object {
