@@ -18,4 +18,12 @@
     <string name="glide_option">Glide: Media management and image loading framework</string>
     <string name="download">Download</string>
     <string name="downloading">Downloading</string>
+
+    <string name="downloading_files">Downloading files</string>
+    <string name="download_success">The file was downloaded with success</string>
+    <string name="download_fail">The download has failed</string>
+    <string name="download_details">View details</string>
+    <string name="file">File: </string>
+    <string name="status">Status: </string>
+    <string name="back">Back</string>
 </resources>
