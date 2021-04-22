@@ -5,7 +5,13 @@
     <Transition
         app:constraintSetEnd="@+id/end"
         app:constraintSetStart="@+id/start"
-        app:duration="4000" />
+        app:duration="4000" >
+
+        <OnClick
+            app:targetId="@id/header"
+            app:clickAction="toggle" />
+
+    </Transition>
 
     <ConstraintSet android:id="@+id/start">
 
