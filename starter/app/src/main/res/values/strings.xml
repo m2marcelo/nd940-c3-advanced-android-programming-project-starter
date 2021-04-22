@@ -14,7 +14,7 @@
 
     <string name="choose">Select the file you want to download.</string>
     <string name="retrofit_option">Retrofit: A Type-safe HTTP client for Android and Java</string>
-    <string name="load_app_option">LoadApp: The current starter repo for this project</string>
+    <string name="load_app_option">LoadApp: Starter repo for this project</string>
     <string name="glide_option">Glide: Media management and image loading framework</string>
     <string name="download">Download</string>
     <string name="downloading">Downloading</string>
@@ -26,4 +26,5 @@
     <string name="file">File: </string>
     <string name="status">Status: </string>
     <string name="back">Back</string>
+    <string name="file_image">File image</string>
 </resources>

@@ -1,7 +1,9 @@
 package com.udacity
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.motion.widget.MotionLayout
 import com.udacity.utils.DownloadNotification
 import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.content_detail.*
@@ -20,18 +22,24 @@ class DetailActivity : AppCompatActivity() {
 
         DownloadNotification.clearNotification(this, downloadId)
 
-        tv_file_name.text = fileName
+        text_file.text = fileName
 
-        tv_download_status.text = if (downloadStatus == MainActivity.DownloadStatus.SUCCESS) {
+        text_status.text = if (downloadStatus == MainActivity.DownloadStatus.SUCCESS) {
             getString(R.string.download_success)
         } else {
             getString(R.string.download_fail)
         }
-        layout_details.transitionToEnd()
+
+        coordinateMotion()
 
         btn_back.setOnClickListener {
             finish()
         }
+    }
+
+    private fun coordinateMotion() {
+        val motionLayout: MotionLayout = findViewById(R.id.motion_layout)
+        motionLayout.transitionToEnd()
     }
 
     private fun loadExtras() {
