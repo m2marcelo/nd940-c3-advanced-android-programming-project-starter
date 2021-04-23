@@ -9,6 +9,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="DetailActivity"
     tools:showIn="@layout/activity_detail">
+
     <ImageView
         android:id="@+id/header"
         android:layout_width="match_parent"
@@ -18,41 +19,62 @@
         android:padding="16dp"
         android:src="@drawable/icon_file"
         app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/label_file"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="44dp"
         android:text="@string/file"
         android:textColor="@android:color/black"
         android:textSize="20sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/btn_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/header"
+        app:layout_constraintVertical_bias="0.093" />
+
     <TextView
         android:id="@+id/text_file"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/load_app_option"/>
+        android:text="@string/load_app_option"
+        app:layout_constraintBottom_toBottomOf="@+id/header"
+        app:layout_constraintStart_toEndOf="@+id/label_file" />
+
     <TextView
         android:id="@+id/label_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="44dp"
         android:text="@string/status"
         android:textColor="@android:color/black"
         android:textSize="20sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/label_file"
+        app:layout_constraintVertical_bias="0.228" />
+
     <TextView
         android:id="@+id/text_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/download_success" />
+        android:text="@string/download_success"
+        app:layout_constraintStart_toEndOf="@+id/label_status"
+        app:layout_constraintTop_toBottomOf="@+id/header" />
+
     <Button
         android:id="@+id/btn_back"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_margin="16dp"
+        android:layout_marginBottom="16dp"
         android:backgroundTint="@color/colorPrimary"
         android:text="@string/back"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteX="16dp" />
+        tools:layout_editor_absoluteX="69dp" />
+
+
 </androidx.constraintlayout.motion.widget.MotionLayout>
